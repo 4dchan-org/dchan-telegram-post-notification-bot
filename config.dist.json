@@ -1,0 +1,9 @@
+{
+    "telegram": {
+        "token": "[numbers]:[key]",
+        "channelId": "[channel-id]"
+    },
+    "subgraph": {
+        "endpoint": "https://api.thegraph.com/subgraphs/name/dchan-network/dchan-alpha-0"
+    }
+}
