@@ -9,6 +9,8 @@ if(!token) throw "No valid token. Edit config.json."
 async function start() {
   await storage.init({});
 
+  const threads: {[keyof: string] : number} = {}
+
   try {
     let lastCreatedAt = (await storage.getItem('lastCreatedAt')) || 0
 
@@ -25,20 +27,21 @@ async function start() {
       for (const { 
         id,
         n,
-        board: {
-          name: boardName
-        },
+        board,
         image,
         name,
         comment,
         from: {
           b58id: fromId
-        } 
+        },
+        thread
       } of posts) {
-        const msg = `[${name} (${fromId}) @ /${boardName}/ \>\>${n}](https://dchan.network/#/${id}):\n${image?.ipfsHash ? `🖼 https://ipfs.io/ipfs/${image.ipfsHash} (${image.name})\n` : ""}\n${comment}`
-        await bot.sendMessage(channelId, msg, {
-          parse_mode: "Markdown"
+        const msg = `${thread === null ? "*New thread*\n" : ""}${name} (ID: ${fromId}) @ [/${board.name}/](https://dchan.network/#/${board.id}) No.${n} [View](https://dchan.network/#/${id}):\n${image?.ipfsHash ? `https://ipfs.io/ipfs/${image.ipfsHash} (${image.name})\n` : ""}---\n${comment}`
+        const result = await bot.sendMessage(channelId, msg, {
+          parse_mode: "Markdown",
+          ...(!!thread ? {reply_to_message_id: threads[thread.id]} : {})
         })
+        if(!!thread) threads[thread.id] = result.message_id
       }
 
       lastCreatedAt = parseInt(createdAt)
