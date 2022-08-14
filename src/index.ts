@@ -36,7 +36,13 @@ async function start() {
         },
         thread
       } of posts) {
-        const msg = `${thread === null ? "*New thread*\n" : ""}${name} (ID: ${fromId}) @ [/${board.name}/](https://dchan.network/#/${board.id}) No.${n} [View](https://dchan.network/#/${id}):\n${image?.ipfsHash ? `https://ipfs.io/ipfs/${image.ipfsHash} (${image.name})\n` : ""}---\n${comment}`
+        const msg = `${thread === null ? "*New thread*\n" : ""}${name} (ID: ${fromId}) @ [/${board.name}/](https://dchan.network/#/${board.id}) No.${n} [View](https://dchan.network/#/${id}):\n${image?.ipfsHash ? `https://ipfs.io/ipfs/${image.ipfsHash} (${image.name})\n` : ""}---\n${
+          comment
+            .replace("_", "\_")
+            .replace("*", "\*")
+            .replace("[", "\[")
+            .replace("`", "\`")
+          }`
         const result = await bot.sendMessage(channelId, msg, {
           parse_mode: "Markdown",
           ...(!!thread ? {reply_to_message_id: threads[thread.id]} : {})
