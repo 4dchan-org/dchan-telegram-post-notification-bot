@@ -18,7 +18,6 @@ async function start() {
 
     const refresh = async () => {
       let { posts } = await getLatestPosts()
-      const [{createdAt}] = posts
 
       posts = posts
         .reverse()
@@ -34,7 +33,8 @@ async function start() {
         from: {
           b58id: fromId
         },
-        thread
+        thread,
+        createdAt
       } of posts) {
         const msg = `${thread === null ? "*New thread*\n" : ""}${name} (ID: ${fromId}) @ [/${board.name}/](https://dchan.network/#/${board.id}) No.${n} [View](https://dchan.network/#/${id}):\n${image?.ipfsHash ? `https://ipfs.io/ipfs/${image.ipfsHash} (${image.name})\n` : ""}---\n${
           comment
@@ -48,10 +48,10 @@ async function start() {
           ...(!!thread ? {reply_to_message_id: threads[thread.id]} : {})
         })
         if(!!thread) threads[thread.id] = result.message_id
-      }
 
-      lastCreatedAt = parseInt(createdAt)
-      await storage.setItem('lastCreatedAt', lastCreatedAt)
+        lastCreatedAt = parseInt(createdAt)
+        await storage.setItem('lastCreatedAt', lastCreatedAt)
+      }
     }
 
     await refresh()
